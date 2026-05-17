@@ -13,8 +13,8 @@ SENSOR_TYPES: tuple[tuple[str, SensorEntityDescription, tuple[object, ...]], ...
     ("signal_rsrq", SensorEntityDescription(key="signal_rsrq", name="RSRQ", native_unit_of_measurement="dB"), ("lte", "active", 0, "rsrq")),
     ("signal_rssi", SensorEntityDescription(key="signal_rssi", name="RSSI", native_unit_of_measurement="dBm"), ("lte", "active", 0, "rssi")),
     ("signal_sinr", SensorEntityDescription(key="signal_sinr", name="SINR", native_unit_of_measurement="dB"), ("lte", "active", 0, "sinr")),
-    ("traffic_lte_download_gb", SensorEntityDescription(key="traffic_lte_download_gb", name="LTE download", native_unit_of_measurement="GB"), ("data", "lte", "download", "val_gb")),
-    ("traffic_lte_upload_gb", SensorEntityDescription(key="traffic_lte_upload_gb", name="LTE upload", native_unit_of_measurement="GB"), ("data", "lte", "upload", "val_gb")),
+    ("download", SensorEntityDescription(key="download", name="Download", native_unit_of_measurement="GB"), ("data", "eth", "download", "val_gb")),
+    ("upload", SensorEntityDescription(key="upload", name="Upload", native_unit_of_measurement="GB"), ("data", "eth", "upload", "val_gb")),
 )
 
 

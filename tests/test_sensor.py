@@ -122,8 +122,8 @@ async def test_fastmile_sensors_and_binary_sensor_use_snapshot_and_device_info(
         "signal_rsrq": ("-13", "dB"),
         "signal_rssi": ("-56", "dBm"),
         "signal_sinr": ("6", "dB"),
-        "traffic_lte_download_gb": ("123.4", "GB"),
-        "traffic_lte_upload_gb": ("56.7", "GB"),
+        "download": ("1.0", "GB"),
+        "upload": ("0.5", "GB"),
     }
 
     device_id = None
