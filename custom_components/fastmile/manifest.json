@@ -1,0 +1,11 @@
+{
+  "domain": "fastmile",
+  "name": "FastMile",
+  "version": "0.1.0",
+  "codeowners": ["@adrian"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/adrian/fastmile-ha",
+  "iot_class": "local_polling",
+  "requirements": ["fastmile-parser>=0.1.2"]
+}
