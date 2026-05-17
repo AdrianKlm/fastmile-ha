@@ -9,7 +9,7 @@ from homeassistant.components.binary_sensor import (
 )
 
 from .const import DOMAIN
-from .entity import FastMileEntity, snapshot_get
+from .entity import FastMileEntity
 
 
 ONLINE_DESCRIPTION = BinarySensorEntityDescription(key="online", name="Online")
@@ -30,7 +30,7 @@ class FastMileBinarySensor(FastMileEntity, BinarySensorEntity):
     @property
     def is_on(self) -> bool:
         """Return whether the router is online."""
-        return bool(snapshot_get(self.coordinator.data, self.entity_description.key))
+        return bool(self.coordinator.last_update_success)
 
 
 async def async_setup_entry(hass, entry, async_add_entities) -> None:

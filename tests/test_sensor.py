@@ -10,6 +10,18 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.plugins import MockConfigEntry
 
+from fastmile_parser.models import (
+    ApnInfo,
+    CaInfo,
+    CellSignal,
+    DeviceInfo,
+    InterfaceData,
+    LteInfo,
+    Snapshot,
+    SnapshotData,
+    TrafficValue,
+)
+
 from custom_components.fastmile.const import (
     CONF_HOST,
     CONF_SCAN_INTERVAL,
@@ -35,16 +47,51 @@ async def test_fastmile_sensors_and_binary_sensor_use_snapshot_and_device_info(
     hass, enable_custom_integrations, monkeypatch, config_entry
 ):
     """Entities should read snapshot data and attach to one device."""
-    snapshot = SimpleNamespace(
-        online=True,
-        rsrp=-106,
-        rsrq=-12,
-        rssi=-72,
-        sinr=7,
-        lte_download_gb=123.4,
-        lte_upload_gb=56.7,
-        serial_number="FM123456",
-        model="FastMile 5G",
+    snapshot = Snapshot(
+        device=DeviceInfo(
+            model="FastMile 5G",
+            software_version="1.0",
+            serial_number="FM123456",
+            imei="IMEI123",
+            imsi="IMSI456",
+            mac="AA:BB:CC:DD:EE:FF",
+            lock_status="Normal",
+        ),
+        apns=[ApnInfo(name="internet", ipv4="10.0.0.2", ipv6=None)],
+        data=SnapshotData(
+            eth=InterfaceData(
+                download=TrafficValue(val=1.0, unit="GB", val_gb=1.0),
+                upload=TrafficValue(val=0.5, unit="GB", val_gb=0.5),
+            ),
+            lte=InterfaceData(
+                download=TrafficValue(val=123.4, unit="GB", val_gb=123.4),
+                upload=TrafficValue(val=56.7, unit="GB", val_gb=56.7),
+            ),
+        ),
+        lte=LteInfo(
+            ca=CaInfo(enb=291067, cid=13, dl_bands=[20, 3], ul_bands=[20]),
+            active=[
+                CellSignal(
+                    pci=38,
+                    earfcn=6200,
+                    cell_type="CellPrimary",
+                    rsrp=-87,
+                    rsrq=-13,
+                    rssi=-56,
+                    sinr=6,
+                ),
+                CellSignal(
+                    pci=131,
+                    earfcn=1725,
+                    cell_type="CellSecondary",
+                    rsrp=-104,
+                    rsrq=-15,
+                    rssi=-69,
+                    sinr=7,
+                ),
+            ],
+            available=[],
+        ),
     )
 
     class FakeRouterClient:
@@ -71,10 +118,10 @@ async def test_fastmile_sensors_and_binary_sensor_use_snapshot_and_device_info(
     device_registry = dr.async_get(hass)
 
     expected_sensors = {
-        "signal_rsrp": ("-106", "dBm"),
-        "signal_rsrq": ("-12", "dB"),
-        "signal_rssi": ("-72", "dBm"),
-        "signal_sinr": ("7", "dB"),
+        "signal_rsrp": ("-87", "dBm"),
+        "signal_rsrq": ("-13", "dB"),
+        "signal_rssi": ("-56", "dBm"),
+        "signal_sinr": ("6", "dB"),
         "traffic_lte_download_gb": ("123.4", "GB"),
         "traffic_lte_upload_gb": ("56.7", "GB"),
     }
@@ -103,9 +150,10 @@ async def test_fastmile_sensors_and_binary_sensor_use_snapshot_and_device_info(
     online_entity_entry = entity_registry.async_get(online_entity_id)
     assert online_entity_entry is not None
     assert online_entity_entry.device_id == device_id
+    assert hass.states.get(online_entity_id).state == "on"
 
     assert device_id is not None
     device = device_registry.async_get(device_id)
     assert device is not None
     assert (DOMAIN, config_entry.data[CONF_HOST]) in device.identifiers
-    assert device.name == snapshot.model
+    assert device.name == config_entry.data[CONF_HOST]

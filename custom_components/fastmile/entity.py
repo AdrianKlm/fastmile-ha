@@ -23,6 +23,24 @@ def snapshot_get(snapshot: Any, key: str, default: Any = None) -> Any:
     return getattr(snapshot, key, default)
 
 
+def snapshot_path(snapshot: Any, *path: object, default: Any = None) -> Any:
+    """Read a nested value from a snapshot-like object."""
+    current = snapshot
+    for key in path:
+        if current is None:
+            return default
+        if isinstance(key, int) and isinstance(current, (list, tuple)):
+            if key >= len(current):
+                return default
+            current = current[key]
+            continue
+        if isinstance(current, Mapping):
+            current = current.get(key, default)
+        else:
+            current = getattr(current, str(key), default)
+    return current
+
+
 def snapshot_device_identifiers(snapshot: Any) -> set[tuple[str, str]]:
     """Build extra identifiers from snapshot data when available."""
     identifiers: set[tuple[str, str]] = set()

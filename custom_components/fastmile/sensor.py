@@ -5,22 +5,16 @@ from __future__ import annotations
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
 
 from .const import DOMAIN
-from .entity import FastMileEntity, snapshot_get
+from .entity import FastMileEntity, snapshot_path
 
 
-def _description(key: str, name: str, native_unit_of_measurement: str, value_key: str) -> SensorEntityDescription:
-    description = SensorEntityDescription(key=key, name=name, native_unit_of_measurement=native_unit_of_measurement)
-    object.__setattr__(description, "value_key", value_key)
-    return description
-
-
-SENSOR_TYPES: tuple[SensorEntityDescription, ...] = (
-    _description("signal_rsrp", "RSRP", "dBm", "rsrp"),
-    _description("signal_rsrq", "RSRQ", "dB", "rsrq"),
-    _description("signal_rssi", "RSSI", "dBm", "rssi"),
-    _description("signal_sinr", "SINR", "dB", "sinr"),
-    _description("traffic_lte_download_gb", "LTE download", "GB", "lte_download_gb"),
-    _description("traffic_lte_upload_gb", "LTE upload", "GB", "lte_upload_gb"),
+SENSOR_TYPES: tuple[tuple[str, SensorEntityDescription, tuple[object, ...]], ...] = (
+    ("signal_rsrp", SensorEntityDescription(key="signal_rsrp", name="RSRP", native_unit_of_measurement="dBm"), ("lte", "active", 0, "rsrp")),
+    ("signal_rsrq", SensorEntityDescription(key="signal_rsrq", name="RSRQ", native_unit_of_measurement="dB"), ("lte", "active", 0, "rsrq")),
+    ("signal_rssi", SensorEntityDescription(key="signal_rssi", name="RSSI", native_unit_of_measurement="dBm"), ("lte", "active", 0, "rssi")),
+    ("signal_sinr", SensorEntityDescription(key="signal_sinr", name="SINR", native_unit_of_measurement="dB"), ("lte", "active", 0, "sinr")),
+    ("traffic_lte_download_gb", SensorEntityDescription(key="traffic_lte_download_gb", name="LTE download", native_unit_of_measurement="GB"), ("data", "lte", "download", "val_gb")),
+    ("traffic_lte_upload_gb", SensorEntityDescription(key="traffic_lte_upload_gb", name="LTE upload", native_unit_of_measurement="GB"), ("data", "lte", "upload", "val_gb")),
 )
 
 
@@ -30,19 +24,20 @@ class FastMileSensor(FastMileEntity, SensorEntity):
     _attr_has_entity_name = True
     entity_description: SensorEntityDescription
 
-    def __init__(self, coordinator, entry, description: SensorEntityDescription) -> None:
+    def __init__(self, coordinator, entry, description: SensorEntityDescription, value_path: tuple[object, ...]) -> None:
         super().__init__(coordinator, entry)
         self.entity_description = description
+        self._value_path = value_path
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"
         self._attr_native_unit_of_measurement = description.native_unit_of_measurement
 
     @property
     def native_value(self):
         """Return the latest value from the coordinator snapshot."""
-        return snapshot_get(self.coordinator.data, self.entity_description.value_key)
+        return snapshot_path(self.coordinator.data, *self._value_path)
 
 
 async def async_setup_entry(hass, entry, async_add_entities) -> None:
     """Set up FastMile sensors from a config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities(FastMileSensor(coordinator, entry, description) for description in SENSOR_TYPES)
+    async_add_entities(FastMileSensor(coordinator, entry, description, value_path) for _, description, value_path in SENSOR_TYPES)

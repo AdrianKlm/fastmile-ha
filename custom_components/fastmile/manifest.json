@@ -1,7 +1,7 @@
 {
   "domain": "fastmile",
   "name": "FastMile",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "codeowners": ["@adrian"],
   "config_flow": true,
   "dependencies": [],
