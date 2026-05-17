@@ -15,3 +15,7 @@ The config flow collects router host, request timeout, and polling interval. The
 ## Setup
 
 Enter the router host, timeout, and polling interval when prompted. After setup, Home Assistant creates the FastMile entities and keeps them updated using local polling.
+
+## Reconfigure
+
+Open the integration in `Settings` > `Devices & services`, choose `FastMile`, then use `Reconfigure` to change the host, timeout, or polling interval.

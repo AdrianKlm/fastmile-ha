@@ -3,11 +3,18 @@
     "step": {
       "user": {
         "title": "Connect to FastMile router",
-        "description": "Enter the router host, credentials, timeout in seconds, and polling interval in seconds.",
+        "description": "Enter the router host, timeout in seconds, and polling interval in seconds.",
         "data": {
           "host": "Router host",
-          "username": "Username",
-          "password": "Password",
+          "timeout": "Request timeout (seconds)",
+          "scan_interval": "Polling interval (seconds)"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure FastMile router",
+        "description": "Update the router host, timeout, or polling interval.",
+        "data": {
+          "host": "Router host",
           "timeout": "Request timeout (seconds)",
           "scan_interval": "Polling interval (seconds)"
         }
