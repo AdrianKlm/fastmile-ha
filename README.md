@@ -4,11 +4,13 @@ Home Assistant custom integration for FastMile routers.
 
 The config flow collects router host, request timeout, and polling interval. The polling interval is in seconds.
 
-## Installation
+## Install with HACS
 
-1. Copy `custom_components/fastmile` into your Home Assistant `custom_components` directory.
-2. Restart Home Assistant.
-3. In Home Assistant, go to `Settings` > `Devices & services` > `Add integration` and select `FastMile`.
+1. In Home Assistant, open `HACS`.
+2. Add `AdrianKlm/fastmile-ha` as a custom repository of type `Integration`.
+3. Install `FastMile HA` from HACS.
+4. Restart Home Assistant.
+5. In Home Assistant, go to `Settings` > `Devices & services` > `Add integration` and select `FastMile`.
 
 ## Setup
 
